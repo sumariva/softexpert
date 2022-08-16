@@ -2,6 +2,7 @@
 
 namespace Emercado\Controller;
 
+use Emercado\Model\Usuario as UsuarioModel;
 
 class Usuario extends Base {
     /**
@@ -9,8 +10,7 @@ class Usuario extends Base {
      */
     public function salvar()
     {
-        print_r($this->getRequest()->get());
-        print_r($this->getRequest()->post());
-        print 'salvar ok';
+        $oUsuario = new UsuarioModel();
+        $this->getResponse()->sendJson($this->getRequest()->post());
     }
 }

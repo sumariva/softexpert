@@ -19,7 +19,7 @@ class ConfigReader {
     {
         $aConfig = include dirname(__FILE__, 3)
             .DIRECTORY_SEPARATOR.'config'
-            .DIRECTORY_SEPARATOR.'app'.(Env::isDevelopment() ?: '-local').'php';
+            .DIRECTORY_SEPARATOR.'app'.(Env::isDevelopment() ? '-local' : '').'.php';
         return $aConfig;
     }
 }

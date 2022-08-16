@@ -10,6 +10,7 @@ class Response {
     public function setHeader($sName, $sValue)
     {
         $this->aHeaders[$sName] = $sValue;
+        return $this;
     }
     /**
      * Serialize the response
@@ -24,5 +25,18 @@ class Response {
         foreach ($this->aHeaders as $sName => $sValue) {
             header($sName.': '.$sValue);
         };
+    }
+    /**
+     * Send the variable
+     * @param string|float|int|bool|null|array $mixed any variavle not begin an resource
+     * @param $bExit (optional) default true it will stop processing
+     */
+    public function sendJson($mixed, $bExit = true)
+    {
+        $this->setHeader('Content-type', 'application/json')->send();
+        print json_encode($mixed);
+        if ($bExit) {
+            exit();
+        }
     }
 }

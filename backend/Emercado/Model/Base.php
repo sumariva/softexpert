@@ -16,6 +16,7 @@ class Base {
     {
         $this->sTable = $sTable;
         $this->oConnection = ConnectionFactory::getConnection();
+        println(gettype($this->oConnection));
     }
 
     public function insert($aValues)
