@@ -1,31 +1,41 @@
 <script setup>
-import { reactive } from 'vue'
-import '../../node_modules/jquery/dist/jquery.min.js'
-const props = defineProps({
-  path: {type: String, required: true}
-})
+import { reactive, inject } from 'vue'
+
+const oApp = inject('app'); // app variables
+
 const state = reactive({
     name: '',
     email: '',
     token: '',
-    disabled: true // ui state
+    disabled: true, // ui state
+    error: '', // display message to client
+    success: false // will be true if action succeded
 });
 
 const allowSubmit = () => {
     state.disabled = ! new Boolean(state.name.length && state.email.length && state.token.length).valueOf();
 }
+
 const postForm = (e) => {
-    // console.log(jQuery(e.target).serialize());
     const oAjax = new XMLHttpRequest();
-    oAjax.open("POST", props.path + "/usuario/salvar");
+    oAjax.open("POST", oApp.sServerUrl + "/usuario/salvar");
     oAjax.setRequestHeader('Access-Control-Allow-Origin', window.location.origin);
     oAjax.setRequestHeader('Accept', 'application/json');
+    oAjax.onerror = () => state.error = 'Sem comunicação com o sistema.';
     oAjax.onload = (data => {
         try {
             let oResponse = JSON.parse(data.target.response);
-            console.log(oResponse);
+            if (oResponse) {
+                state.error = oResponse;
+                return;
+            }
+            state.error = '';
+            state.success = true;
+            state.name = '';
+            state.email = '';
+            state.token = '';
         } catch (e) {
-            console.log('TODO error handler');
+            state.error = 'Erro no servidor.';
         }
     });
     oAjax.send(new FormData(e.target));
@@ -60,6 +70,7 @@ const postForm = (e) => {
                             <label for="email">Email</label>
                             <div class="invalid-feedback" data-sb-feedback="email:required">Email é necessário.</div>
                             <div class="invalid-feedback" data-sb-feedback="email:email">Email em formato incorreto.</div>
+                            <div class="invalid-feedback" data-sb-feedback="email:duplicated">Email em formato incorreto.</div>
                         </div>
                         <!-- Message input-->
                         <div class="form-floating mb-3">
@@ -68,22 +79,17 @@ const postForm = (e) => {
                             <div class="invalid-feedback" data-sb-feedback="message:required">A senha é necessária.</div>
                         </div>
                         <!-- Submit success message-->
-                        <!---->
                         <!-- This is what your users will see when the form-->
                         <!-- has successfully submitted-->
-                        <div class="d-none" id="submitSuccessMessage">
+                        <div :class="{'d-none': ! state.success}" id="submitSuccessMessage">
                             <div class="text-center mb-3">
-                                <div class="fw-bolder">Form submission successful!</div>
-                                To activate this form, sign up at
-                                <br />
-                                <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                                <div class="fw-bolder">Cliente cadastrado!</div>
                             </div>
                         </div>
                         <!-- Submit error message-->
-                        <!---->
                         <!-- This is what your users will see when there is-->
                         <!-- an error submitting the form-->
-                        <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
+                        <div :class="{'d-none': state.error.length == 0}" id="submitErrorMessage"><div class="text-center text-danger mb-3">{{state.error}}</div></div>
                         <!-- Submit Button-->
                         <button class="btn btn-primary btn-xl" :class="{disabled: state.disabled}" id="submitButton" type="submit">Cadastrar</button>
                     </form>

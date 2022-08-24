@@ -1,6 +1,5 @@
 <script setup>
-import { RouterLink } from 'vue-router'
-import HelloWorld from './HelloWorld.vue'
+import MenuBar from './MenuBar.vue'
 </script>
 
 <template>
@@ -13,23 +12,19 @@ import HelloWorld from './HelloWorld.vue'
                 <i class="fas fa-bars"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#portfolio">Nosos produtos</a></li>
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">Sobre</a></li>
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#signin">Acesso</a></li>
-                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#register">Cadastro</a></li>
-                </ul>
+                <MenuBar />
             </div>
         </div>
     </nav>
-    <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-    </nav>
-    <HelloWorld msg="You did it!" />
 </template>
 
 <style scoped>
+
+.fixed-top {
+  position: static;
+  margin: 0;
+  z-index: 1030;
+}
 
 #mainNav {
   padding-top: 1rem;
