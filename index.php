@@ -7,6 +7,16 @@ define('PROJECT_ROOT', dirname($_SERVER['SCRIPT_FILENAME']));
  * @param string|null $sText
  */
 function println($sText = null) { print ($sText === false ? 0 : $sText).PHP_EOL; }
+
+/**
+ * Source from https://pt.stackoverflow.com/questions/96983/fun%C3%A7%C3%A3o-de-convers%C3%A3o-camelcase
+ */
+function toCamelCase($string) {
+    //Converte todas as '-' em espaço em branco para a função ucwords funcionar.
+    $string = str_replace('-', ' ', $string);
+
+    return str_replace(' ', '', lcfirst(ucwords($string)));
+}
 /**
  * php path directive
  */
@@ -46,7 +56,7 @@ if (! array_key_exists('PATH_INFO', $_SERVER)) {
     exit(1);
 }
 @list(, $sController, $sAction) = explode('/', $_SERVER['PATH_INFO']);
-
+$sAction = toCamelCase($sAction);
 $sController = 'Emercado\Controller\\'.ucfirst($sController);
 if (! class_exists($sController) || !method_exists($sController, $sAction)) {
     header("HTTP/1.1 404 Not Found");

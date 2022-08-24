@@ -1,25 +1,77 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import About from './components/About.vue'
-import Category from './components/Category.vue'
+import { onMounted, provide, reactive } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
-import SignIn from './components/SignIn.vue'
-import SignUp from './components/SignUp.vue'
+
+provide('menuItens', reactive([ // app initial menu itens
+    {label: 'Início', to: '/'},
+    {label: 'Acesso', to: '/entrar'},
+    {label: 'Cadastro', to: '/cadastro'},
+    {label: 'Sobre', to: '/sobre'}
+]))
+
 const sServer = window.location.origin.replace(window.location.port, '') + '8080';
 const sPath = sServer + '/index.php';
+let sServerFront = window.location.origin.replace(window.location.port, '')
+sServerFront = sServerFront.substring(0, sServerFront.length - 1) + ':5173'
+
+provide('app', reactive({
+    sFrontUrl: sServerFront,
+    sServerUrl: sPath,
+    user: {}, // app initial logged user
+    productTypes: [], // categories
+    products: [], // products
+    // TODO if list grows need to paginate
+    fetchProductType: () => {
+        return fetch(
+            sPath + "/produto/tipos",
+            { method: 'post', cache: 'no-store'}
+        )
+    },
+    fetchProduct: () => {
+        return fetch(
+            sPath + "/produto/listar",
+            { method: 'post', cache: 'no-store'}
+        )
+    },
+    fetchProductInCategory: (nCategory) => {
+        let $oForm = new FormData();
+        $oForm.append('tipo', nCategory);
+        return fetch(
+            sPath + "/produto/listar-categoria",
+            { method: 'post', cache: 'no-store', body: $oForm}
+        )
+    },
+    /**
+     * NOTA ainda não funciona com negativos e numeros gigantes
+     */
+    numberFormat: (nValue, nDecimals, sDecimalSeparator, sThousandSeparator) => {
+        let sIntegral = Number(Math.floor(nValue)).toFixed(0);
+        let sFracional = (nDecimals > 0 ? sDecimalSeparator : '') + Number(nValue - sIntegral).toFixed(nDecimals).substring(2)
+        sIntegral = sIntegral.split('').reverse().reduce(
+            (sPrevious, sChar, nIndex) => {
+                return nIndex > 0 && nIndex % 3 == 0 ? sPrevious + sThousandSeparator + sChar : sPrevious + sChar
+            },
+            ''
+        ).split('').reverse().join('')
+        return sIntegral + sFracional
+    },
+    carrinho: {}
+}))
+
+onMounted(() => {
+  let el = document.createElement('script');
+  el.setAttribute('src', sServerFront + '/assets/js/scripts.js');
+  // Core theme JS
+  document.getElementsByTagName('head')[0].appendChild(el);
+})
 </script>
 
 <template>
-  <RouterView />
   <Header />
-  <Category />
-  <About />
+  <RouterView />
   <Footer />
-  <!-- sign up form -->
-  <SignUp :path="sPath"/>
-  <!-- sign in form -->
-  <SignIn />
 </template>
 
 <style scoped>
